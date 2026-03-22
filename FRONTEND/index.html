@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Website Tracker</title>
+
+  <!-- Google Fonts: DM Sans (clean, modern, readable) + DM Mono for URLs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+  <!-- Phosphor Icons (lightweight, beautiful icon set) -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════ HEADER ═════ -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="logo">
+          <i class="ph-duotone ph-globe"></i>
+          <span>Website Tracker</span>
+        </div>
+        <button class="btn btn-primary" id="openAddModal">
+          <i class="ph ph-plus"></i>
+          Add Website
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════ MAIN ════════ -->
+  <main class="main">
+    <div class="container">
+
+      <!-- ── Stats Bar ────────────────────────────────────────────────── -->
+      <div class="stats-bar">
+        <div class="stat-chip">
+          <span class="stat-number" id="totalCount">0</span>
+          <span class="stat-label">Total Sites</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-number" id="filteredCount">0</span>
+          <span class="stat-label">Shown</span>
+        </div>
+      </div>
+
+      <!-- ── Controls: Filter + Sort ──────────────────────────────────── -->
+      <div class="controls-card">
+        <div class="controls-row">
+
+          <!-- Date Filter -->
+          <div class="control-group">
+            <label class="control-label">
+              <i class="ph ph-calendar"></i> Filter by Date
+            </label>
+            <div class="date-range">
+              <div class="input-wrap">
+                <input type="date" id="filterStart" class="input" placeholder="Start date" />
+                <span class="input-hint">From</span>
+              </div>
+              <span class="date-sep">→</span>
+              <div class="input-wrap">
+                <input type="date" id="filterEnd" class="input" placeholder="End date" />
+                <span class="input-hint">To</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sort -->
+          <div class="control-group control-group--sort">
+            <label class="control-label">
+              <i class="ph ph-sort-ascending"></i> Sort
+            </label>
+            <div class="sort-btns">
+              <button class="sort-btn active" id="sortDesc" title="Newest first">
+                <i class="ph ph-arrow-down"></i> Newest
+              </button>
+              <button class="sort-btn" id="sortAsc" title="Oldest first">
+                <i class="ph ph-arrow-up"></i> Oldest
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Filter Action Buttons -->
+        <div class="controls-actions">
+          <button class="btn btn-secondary" id="applyFilter">
+            <i class="ph ph-funnel"></i> Apply Filter
+          </button>
+          <button class="btn btn-ghost" id="clearFilter">
+            <i class="ph ph-x"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Websites List ─────────────────────────────────────────────── -->
+      <div id="websitesList" class="websites-list">
+        <!-- cards rendered by JS -->
+      </div>
+
+      <!-- ── Empty State ──────────────────────────────────────────────── -->
+      <div id="emptyState" class="empty-state hidden">
+        <i class="ph ph-planet"></i>
+        <h3>No websites here yet</h3>
+        <p>Click <strong>Add Website</strong> to start tracking your favourite sites.</p>
+      </div>
+
+      <!-- ── Error State ──────────────────────────────────────────────── -->
+      <div id="errorState" class="error-state hidden">
+        <i class="ph ph-warning-circle"></i>
+        <h3>Could not connect to server</h3>
+        <p>Make sure the backend is running on <code>http://localhost:5000</code><br/>
+           then refresh this page.</p>
+      </div>
+
+      <!-- ── Loading ──────────────────────────────────────────────────── -->
+      <div id="loadingState" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading…</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════ ADD MODAL ═════ -->
+  <div class="modal-overlay hidden" id="addModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><i class="ph ph-plus-circle"></i> Add Website</h2>
+        <button class="modal-close" id="closeAddModal" aria-label="Close">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="addForm" novalidate>
+          <div class="form-group">
+            <label for="addName" class="form-label">Website Name <span class="required">*</span></label>
+            <input type="text" id="addName" class="input" placeholder="e.g. GitHub" required />
+            <span class="field-error hidden" id="addNameError"></span>
+          </div>
+          <div class="form-group">
+            <label for="addUrl" class="form-label">URL <span class="required">*</span></label>
+            <input type="url" id="addUrl" class="input" placeholder="https://example.com" required />
+            <span class="field-error hidden" id="addUrlError"></span>
+          </div>
+          <div class="form-group">
+            <label for="addDate" class="form-label">Date Added</label>
+            <input type="date" id="addDate" class="input" required />
+          </div>
+          <div class="form-group">
+            <label for="addNotes" class="form-label">Notes <span class="optional">(optional)</span></label>
+            <textarea id="addNotes" class="input textarea" rows="3" placeholder="Any notes about this site…"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelAdd">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="addSubmitBtn">
+              <i class="ph ph-check"></i> Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ EDIT MODAL ════ -->
+  <div class="modal-overlay hidden" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2><i class="ph ph-pencil-simple"></i> Edit Website</h2>
+        <button class="modal-close" id="closeEditModal" aria-label="Close">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm" novalidate>
+          <input type="hidden" id="editId" />
+          <div class="form-group">
+            <label for="editName" class="form-label">Website Name <span class="required">*</span></label>
+            <input type="text" id="editName" class="input" required />
+            <span class="field-error hidden" id="editNameError"></span>
+          </div>
+          <div class="form-group">
+            <label for="editUrl" class="form-label">URL <span class="required">*</span></label>
+            <input type="url" id="editUrl" class="input" required />
+            <span class="field-error hidden" id="editUrlError"></span>
+          </div>
+          <div class="form-group">
+            <label for="editDate" class="form-label">Date Added</label>
+            <input type="date" id="editDate" class="input" required />
+          </div>
+          <div class="form-group">
+            <label for="editNotes" class="form-label">Notes <span class="optional">(optional)</span></label>
+            <textarea id="editNotes" class="input textarea" rows="3"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelEdit">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="editSubmitBtn">
+              <i class="ph ph-check"></i> Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ DELETE CONFIRM ════ -->
+  <div class="modal-overlay hidden" id="deleteModal">
+    <div class="modal modal--sm">
+      <div class="modal-header">
+        <h2><i class="ph ph-trash"></i> Delete Website</h2>
+        <button class="modal-close" id="closeDeleteModal">
+          <i class="ph ph-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="delete-msg">
+          Are you sure you want to delete <strong id="deleteWebsiteName"></strong>?<br/>
+          This action cannot be undone.
+        </p>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="cancelDelete">Cancel</button>
+          <button class="btn btn-danger" id="confirmDelete">
+            <i class="ph ph-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ TOAST ══════════ -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
