@@ -5,7 +5,7 @@
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 // Change this if your backend runs on a different port / domain
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://ai-website-tracker.onrender.com/api";
 
 // ─── State ───────────────────────────────────────────────────────────────────
 let sortOrder    = "desc";   // "asc" | "desc"
