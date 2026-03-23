@@ -1,5 +1,5 @@
 {
-  "nextId": 6,
+  "nextId": 7,
   "websites": [
     {
       "id": 1,
@@ -35,6 +35,13 @@
       "url": "https://excalidraw.com",
       "date_added": "2024-05-01",
       "notes": "Whiteboard / diagrams tool"
+    },
+    {
+      "id": 6,
+      "name": "leetcode",
+      "url": "https://leetcode.com",
+      "date_added": "2026-03-22",
+      "notes": "solved daily problem"
     }
   ]
 }
